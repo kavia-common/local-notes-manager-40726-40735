@@ -6,18 +6,16 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Enable Qt's automatic processing
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTORCC ON)
+# Global AUTOGEN off by default to avoid accidental GUI autogen in tests
+# We'll enable AUTOGEN only for the GUI target to keep tests headless-safe.
+set(CMAKE_AUTOMOC OFF)
+set(CMAKE_AUTOUIC OFF)
+set(CMAKE_AUTORCC OFF)
 
 # On some environments with newer CMake/Qt6, set policies explicitly
 if(POLICY CMP0071)
   cmake_policy(SET CMP0071 NEW) # AUTOMOC for generated files
 endif()
-
-# We intentionally separate Qt component discovery for GUI app vs. headless tests to
-# avoid pulling in Qt Widgets for the test target, which would require XKB/GUI deps.
 
 # -----------------------------
 # Main GUI application
@@ -35,10 +33,23 @@ set(HEADERS
 
 # Main app (GUI)
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Core Qt6::Widgets)
+
+# Enable AUTOGEN only for GUI target
 set_target_properties(${PROJECT_NAME} PROPERTIES
+    AUTOMOC ON
+    AUTOUIC ON
+    AUTORCC ON
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
+)
+
+target_include_directories(${PROJECT_NAME}
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+        Qt6::Core
+        Qt6::Widgets
 )
 
 # Convenience run target for CI/dev
@@ -64,9 +75,27 @@ add_executable(NoteUtilsTest
     tests/note_utils_impl.cpp
     include/note_utils.h
 )
-# Expose only the minimal include directory; do not add mainApp.h or Widgets.
-target_include_directories(NoteUtilsTest PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(NoteUtilsTest PRIVATE Qt6::Core Qt6::Test)
+
+# Disable AUTOGEN explicitly for tests
+set_target_properties(NoteUtilsTest PROPERTIES
+    AUTOMOC OFF
+    AUTOUIC OFF
+    AUTORCC OFF
+)
+
+# Expose only the minimal include directory for tests; avoid exposing mainApp.h.
+# If include/ contains both GUI and non-GUI headers, guard test include usage via PRIVATE scope
+# and ensure test code includes only note_utils.h.
+target_include_directories(NoteUtilsTest
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+target_link_libraries(NoteUtilsTest
+    PRIVATE
+        Qt6::Core
+        Qt6::Test
+)
 
 # Ensure tests run in headless environments; they do not create QApplication/QWidget.
 add_test(NAME NoteUtilsTest COMMAND NoteUtilsTest)

@@ -16,7 +16,8 @@
 */
 #ifdef QT_WIDGETS_LIB
 // Hard stop if someone tries to compile this header with Qt Widgets visible in tests.
-#  error "note_utils.h must not be compiled with Qt Widgets available; keep tests headless."
+// This header is intended to be GUI-free and should be built with only Qt Core/Test.
+#  error "note_utils.h must not be compiled with Qt Widgets available; keep tests headless (Qt6::Core/Qt6::Test only)."
 #endif
 
 // PUBLIC_INTERFACE
