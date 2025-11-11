@@ -1,6 +1,15 @@
 cmake_minimum_required(VERSION 3.16)
 project(MainApp VERSION 1.0.0 LANGUAGES CXX)
 
+# Headless CI default: disallow any 'run' helper targets from being added unless explicitly opted in.
+# This is a safeguard to ensure no GUI is started during configure/build/test on CI.
+option(ENABLE_LOCAL_RUN_TARGETS "Enable developer-only run helper targets (never enable on CI)" OFF)
+if(ENABLE_LOCAL_RUN_TARGETS)
+  message(STATUS "Developer run helper targets are ENABLED (ensure you are not on CI/headless).")
+else()
+  add_definitions(-DHEADLESS_CI_BUILD)
+endif()
+
 # C++ standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
