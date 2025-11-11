@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets Test)
 
 set(CMAKE_AUTOMOC ON)
 
@@ -40,4 +40,7 @@ add_custom_target(run
 
 enable_testing()
 
-add_test(NAME ${PROJECT_NAME}Test COMMAND ${PROJECT_NAME})
+# Simple unit test for NoteUtils using a small console test (no GUI)
+add_executable(NoteUtilsTest tests/note_utils_test.cpp include/mainApp.h)
+target_link_libraries(NoteUtilsTest Qt6::Core Qt6::Test)
+add_test(NAME NoteUtilsTest COMMAND NoteUtilsTest)
