@@ -16,12 +16,13 @@ if(POLICY CMP0071)
   cmake_policy(SET CMP0071 NEW) # AUTOMOC for generated files
 endif()
 
-# Include headers
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-
 # We intentionally separate Qt component discovery for GUI app vs. headless tests to
 # avoid pulling in Qt Widgets for the test target, which would require XKB/GUI deps.
-# Find for GUI application
+
+# -----------------------------
+# Main GUI application
+# -----------------------------
+# Find for GUI application ONLY here. Do not expose Widgets to tests.
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
 
 # Sources and headers for GUI app
@@ -34,6 +35,7 @@ set(HEADERS
 
 # Main app (GUI)
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Core Qt6::Widgets)
 set_target_properties(${PROJECT_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
@@ -53,6 +55,7 @@ add_custom_target(run
 enable_testing()
 
 # Only find Core and Test for NoteUtilsTest; DO NOT require Widgets here.
+# This prevents any transitive pull of GUI deps into test target.
 find_package(Qt6 REQUIRED COMPONENTS Core Test)
 
 # Unit test for NoteUtils (console) - GUI-free
@@ -61,6 +64,7 @@ add_executable(NoteUtilsTest
     tests/note_utils_impl.cpp
     include/note_utils.h
 )
+# Expose only the minimal include directory; do not add mainApp.h or Widgets.
 target_include_directories(NoteUtilsTest PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(NoteUtilsTest PRIVATE Qt6::Core Qt6::Test)
 

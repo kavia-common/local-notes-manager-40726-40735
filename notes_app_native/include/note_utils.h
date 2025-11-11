@@ -14,6 +14,10 @@
  
  IMPORTANT: Do not include QApplication, QWidget, QMainWindow, or any Qt GUI headers from here.
 */
+#ifdef QT_WIDGETS_LIB
+// Hard stop if someone tries to compile this header with Qt Widgets visible in tests.
+#  error "note_utils.h must not be compiled with Qt Widgets available; keep tests headless."
+#endif
 
 // PUBLIC_INTERFACE
 struct Note {

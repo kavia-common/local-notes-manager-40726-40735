@@ -2,6 +2,10 @@
 #include "note_utils.h"
 
 // This test must remain GUI-free. Do NOT include mainApp.h or any Qt Widgets headers here.
+// Compile-time guard to ensure no accidental GUI inclusion.
+#ifdef QT_WIDGETS_LIB
+#error "Qt Widgets should not be linked or included in NoteUtilsTest."
+#endif
 
 class NoteUtilsTestCase : public QObject {
     Q_OBJECT
