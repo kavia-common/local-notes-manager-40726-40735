@@ -1,5 +1,5 @@
 #include <QtTest/QtTest>
-#include "mainApp.h"
+#include "note_utils.h"
 
 class NoteUtilsTestCase : public QObject {
     Q_OBJECT

@@ -48,7 +48,12 @@ add_custom_target(run
 # Tests
 enable_testing()
 
-# Unit test for NoteUtils (console)
-add_executable(NoteUtilsTest tests/note_utils_test.cpp include/mainApp.h)
+# Unit test for NoteUtils (console) - GUI-free
+add_executable(NoteUtilsTest
+    tests/note_utils_test.cpp
+    tests/note_utils_impl.cpp
+    include/note_utils.h
+)
+target_include_directories(NoteUtilsTest PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(NoteUtilsTest PRIVATE Qt6::Core Qt6::Test)
 add_test(NAME NoteUtilsTest COMMAND NoteUtilsTest)
