@@ -11,6 +11,8 @@
  Simple domain model and utilities header for use in non-GUI contexts (e.g., unit tests).
  This header intentionally avoids including Qt Widgets or any GUI classes so it can be built
  in headless CI environments where Qt Widgets may be unavailable.
+ 
+ IMPORTANT: Do not include QApplication, QWidget, QMainWindow, or any Qt GUI headers from here.
 */
 
 // PUBLIC_INTERFACE

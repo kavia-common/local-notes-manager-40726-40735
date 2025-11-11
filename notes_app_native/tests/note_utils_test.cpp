@@ -1,6 +1,8 @@
 #include <QtTest/QtTest>
 #include "note_utils.h"
 
+// This test must remain GUI-free. Do NOT include mainApp.h or any Qt Widgets headers here.
+
 class NoteUtilsTestCase : public QObject {
     Q_OBJECT
 private slots:
