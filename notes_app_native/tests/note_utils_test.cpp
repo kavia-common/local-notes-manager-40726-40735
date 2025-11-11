@@ -1,11 +1,16 @@
 #include <QtTest/QtTest>
 #include "note_utils.h"
 
-// This test must remain GUI-free. Do NOT include mainApp.h or any Qt Widgets headers here.
-// Compile-time guard to ensure no accidental GUI inclusion.
-#ifdef QT_WIDGETS_LIB
-#error "Qt Widgets should not be linked or included in NoteUtilsTest."
-#endif
+ // This test must remain GUI-free. Do NOT include mainApp.h or any Qt Widgets headers here.
+ // Compile-time guard to ensure no accidental GUI inclusion.
+ #ifdef QT_WIDGETS_LIB
+ #error "Qt Widgets should not be linked or included in NoteUtilsTest."
+ #endif
+
+ // Implementation note:
+ // - Linked libraries are limited to Qt6::Core and Qt6::Test only (see CMakeLists).
+ // - Do not instantiate QApplication or QWidget-derived classes here.
+ // - Keep this test runnable in headless CI environments.
 
 class NoteUtilsTestCase : public QObject {
     Q_OBJECT

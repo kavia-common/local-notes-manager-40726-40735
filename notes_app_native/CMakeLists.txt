@@ -52,17 +52,26 @@ target_link_libraries(${PROJECT_NAME}
         Qt6::Widgets
 )
 
-# Convenience run target for CI/dev
+# Convenience run target for developers only (never auto-run in CI/setup)
+# Mark as EXCLUDE_FROM_ALL and manual so it is not built or run unless explicitly requested.
 add_custom_target(run
     COMMAND $<TARGET_FILE:${PROJECT_NAME}>
     DEPENDS ${PROJECT_NAME}
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     COMMENT "Running ${PROJECT_NAME}"
 )
+# Prevent inclusion in 'all' target to avoid accidental execution during setup
+set_target_properties(run PROPERTIES EXCLUDE_FROM_ALL TRUE)
+# Mark as manual-only for clarity (CMake will not generate build rules to run it automatically)
+set_property(TARGET run PROPERTY JOB_POOL_COMPILE manual)
 
 # -----------------------------
 # Tests - strictly headless
 # -----------------------------
+# Important policy:
+# - Tests must not link against Qt Widgets or include any GUI headers.
+# - Only Qt6::Core and Qt6::Test are allowed for tests.
+# - No add_custom_command/add_custom_target may run the app during configure/build/test.
 enable_testing()
 
 # Only find Core and Test for NoteUtilsTest; DO NOT require Widgets here.
