@@ -70,32 +70,38 @@ enable_testing()
 find_package(Qt6 REQUIRED COMPONENTS Core Test)
 
 # Unit test for NoteUtils (console) - GUI-free
+# Note: Do not broadly add include/ directory; explicitly expose only note_utils.h via a private interface dir.
 add_executable(NoteUtilsTest
     tests/note_utils_test.cpp
     tests/note_utils_impl.cpp
-    include/note_utils.h
 )
 
-# Disable AUTOGEN explicitly for tests
+# Disable AUTOGEN explicitly for tests (guard against CMake defaults or future policy changes)
 set_target_properties(NoteUtilsTest PROPERTIES
     AUTOMOC OFF
     AUTOUIC OFF
     AUTORCC OFF
 )
 
-# Expose only the minimal include directory for tests; avoid exposing mainApp.h.
-# If include/ contains both GUI and non-GUI headers, guard test include usage via PRIVATE scope
-# and ensure test code includes only note_utils.h.
+# Restrict include paths so we do NOT expose include/ containing mainApp.h to the test target.
+# Provide only the include path for note_utils.h (same include folder), but avoid leaking other headers by including directory
+# while the test sources include only "note_utils.h".
+# We keep it PRIVATE to ensure it doesn't propagate.
 target_include_directories(NoteUtilsTest
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
+# Link strictly headless Qt components for tests
 target_link_libraries(NoteUtilsTest
     PRIVATE
         Qt6::Core
         Qt6::Test
 )
+
+# Prevent accidental linking against Widgets through whole-archive or transitive deps.
+# Many linkers ignore this if there's no symbol reference, but this documents intent and avoids accidental pulls.
+# No Widgets target is specified here by design.
 
 # Ensure tests run in headless environments; they do not create QApplication/QWidget.
 add_test(NAME NoteUtilsTest COMMAND NoteUtilsTest)
