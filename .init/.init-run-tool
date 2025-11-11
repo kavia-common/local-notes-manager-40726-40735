@@ -1,0 +1,4 @@
+{
+    "command": "cmake --build build && DISPLAY=:99  cmake --build build --target run ",
+    "working_directory": "/home/kavia/workspace/code-generation/local-notes-manager-40726-40735/notes_app_native"
+}
