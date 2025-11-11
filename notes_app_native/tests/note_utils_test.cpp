@@ -1,6 +1,8 @@
 #include <QtTest/QtTest>
 #include "note_utils.h"
 
+// Headless CI: This test suite runs without any GUI. Do not instantiate QApplication or show windows.
+
  // This test must remain GUI-free. Do NOT include mainApp.h or any Qt Widgets headers here.
  // Compile-time guard to ensure no accidental GUI inclusion.
  #ifdef QT_WIDGETS_LIB
